@@ -1,16 +1,5 @@
 <template>
-  <div class="turtle__hero">
-    <div class="turtle-logo__wrapper">
-      <div style="font-size: 120px">🐢</div>
-      <h1>TurtlePanes</h1>
-      <div class="turtle-logo__quote">
-        <p style="margin-top: 10px; margin-bottom: 0px">
-          Hide like a turtle. Sting like a bee.
-        </p>
-        <span style="margin-left: auto; opacity: 0.5">- Koopa Troopas</span>
-      </div>
-    </div>
-  </div>
+  <LibraryHeader />
   <div class="demo-showcase__wrapper">
     <TurtlePanes>
       <TurtlePane>
@@ -27,10 +16,12 @@
 </template>
 
 <script setup>
+import LibraryHeader from "./components/LibraryHeader.vue";
 import { TurtlePanes, TurtlePane } from "./components/";
 import FirstPaneContent from "./FirstPaneContent.vue";
 import SecondPaneContent from "./SecondPaneContent.vue";
 import ThirdPaneContent from "./ThirdPaneContent.vue";
+const a =   'ehh' ;
 </script>
 
 <style lang="scss">
