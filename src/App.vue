@@ -28,9 +28,9 @@
 
 <script setup>
 import { TurtlePanes, TurtlePane } from "./components/";
-import FirstPaneContent from "./FirstPaneContent.vue";
-import SecondPaneContent from "./SecondPaneContent.vue";
-import ThirdPaneContent from "./ThirdPaneContent.vue";
+import FirstPaneContent from "./content/FirstPaneContent.vue";
+import SecondPaneContent from "./content/SecondPaneContent.vue";
+import ThirdPaneContent from "./content/ThirdPaneContent.vue";
 </script>
 
 <style lang="scss">
