@@ -5,7 +5,7 @@
     </h1>
     <h2>Unlocking the Power of Frontend Development for Modern Websites</h2>
     <img
-      src="https://via.placeholder.com/800x420?text=Frontend+Development+Overview"
+      src="https://via.placeholder.com/400x420?text=Frontend+Development+Overview"
       alt="Frontend Development"
     />
 

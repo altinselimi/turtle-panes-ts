@@ -3,32 +3,57 @@
     <div
       class="turtle-panes__splitter-target"
       @mousedown="handleMouseDown"
-      @mousemove="handleMouseMove"
-      @mouseup="handleMouseUp"
-      @mouseleave="handleMouseLeave"
     ></div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, inject } from "vue";
+import { ref, inject, computed } from "vue";
+import { attachPaneSplitterInteractionListeners } from "./helpers";
+import type { Ref } from "vue";
 
-const splitter = ref(null);
+const props = defineProps<{
+  paneId?: number | null;
+}>();
+
 const contextRef: any = inject("context");
 const context = contextRef.value;
-const isInteractingWithSplitter = context.interactionState.activePaneId === ;
+const isInteractingWithSplitter = computed(
+  () => context.interactionState.activePaneId === props.paneId,
+);
+const isInteractingWithAnotherSplitter = computed(
+  () =>
+    context.interactionState.activePaneId && !isInteractingWithSplitter.value,
+);
+const initialClientX: Ref<number | null> = ref(null);
 
-const handleMouseDown = (e: EventTarget) => {
-  console.log("handleMouseDown:", e);
-};
-const handleMouseMove = (e: EventTarget) => {
-  if(!context.)
+const handleMouseMove = (e: MouseEvent) => {
   console.log("handleMouseMove:", e);
+  const mouseMovementInPx: number =
+    e.clientX - (initialClientX.value as number);
+  const newWidth: number =
+    context.panes[props.paneId as number].width + mouseMovementInPx;
+  console.log({ [`pane-${props.paneId}`]: newWidth });
+  context.updatePane(props.paneId, {
+    width: newWidth,
+  });
+  initialClientX.value = e.clientX;
 };
-const handleMouseUp = (e: EventTarget) => {
-  console.log("handleMouseUp:", e);
+
+const handleMouseUp = () => {
+  console.log("mouseUp happened");
+  context.setActivePane(null);
 };
-const handleMouseLeave = (e: EventTarget) => {
-  console.log("handleMouseLeave:", e);
+
+const handleMouseDown = (e: MouseEvent) => {
+  if (isInteractingWithAnotherSplitter.value) return;
+  console.log("handleMouseDown:", e);
+  context.setActivePane(props.paneId);
+  initialClientX.value = e.clientX;
+
+  attachPaneSplitterInteractionListeners({
+    mouseMoveCallback: handleMouseMove,
+    mouseUpCallback: handleMouseUp,
+  });
 };
 </script>
 <style lang="scss">
@@ -39,8 +64,10 @@ const handleMouseLeave = (e: EventTarget) => {
     z-index: 2;
     position: relative;
     border-left: dashed 1px #c2c2c2;
+    pointer-events: all;
   }
   &-target {
+    cursor: col-resize;
     position: absolute;
     top: 0;
     bottom: 0;
