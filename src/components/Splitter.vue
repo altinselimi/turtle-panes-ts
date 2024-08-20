@@ -30,12 +30,8 @@ const handleMouseMove = (e: MouseEvent) => {
   console.log("handleMouseMove:", e);
   const mouseMovementInPx: number =
     e.clientX - (initialClientX.value as number);
-  const newWidth: number =
-    context.panes[props.paneId as number].width + mouseMovementInPx;
-  console.log({ [`pane-${props.paneId}`]: newWidth });
-  context.updatePane(props.paneId, {
-    width: newWidth,
-  });
+  context.updatePaneWidth(props.paneId as number, mouseMovementInPx);
+  console.log({ [`pane-${props.paneId}_mouseMovement`]: mouseMovementInPx });
   initialClientX.value = e.clientX;
 };
 
