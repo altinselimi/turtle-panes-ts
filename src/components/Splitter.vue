@@ -31,6 +31,7 @@ const handleMouseMove = (e: MouseEvent) => {
     e.clientX - (initialClientX.value as number);
   try {
     context.updatePaneWidth(props.paneId as number, mouseMovementInPx);
+    context.setPixellsTravelledInPx(mouseMovementInPx);
     initialClientX.value = e.clientX;
   } catch (e) {
     console.error(e);

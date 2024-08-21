@@ -2,10 +2,16 @@
   <div
     ref="paneWrapperRef"
     class="turtle-panes__pane"
-    :class="{ 'is-resizing': isInteractingWithASplitter }"
-    :style="computedStyles"
+    :class="{
+      'is-resizing': isInteractingWithASplitter,
+    }"
   >
-    <div class="turtle-panes__pane-content" ref="paneContentRef">
+    <div
+      class="turtle-panes__pane-content"
+      :class="{ 'has-hidden-overflow': context.containerWidth !== 0 }"
+      :style="computedStyles"
+      ref="paneContentRef"
+    >
       <slot></slot>
     </div>
     <Splitter :paneId="id" />
@@ -80,6 +86,9 @@ onMounted(async () => {
 
 const computedStyles = computed(() => {
   if (!id.value) return {};
+  const stylesAreReady = context.containerWidth !== 0;
+
+  if (!stylesAreReady) return {};
   const pane = context.panes[id.value];
   console.log({
     pane,
@@ -121,6 +130,12 @@ if (props.isHiddenAfterMinWidthExceeded) {
     justify-content: space-between;
     &.is-resizing {
       pointer-events: none;
+    }
+  }
+  &__pane-content {
+    &.has-hidden-overflow {
+      overflow: hidden;
+      overflow-x: scroll;
     }
   }
 }
