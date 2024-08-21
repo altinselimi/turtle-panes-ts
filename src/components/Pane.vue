@@ -2,10 +2,16 @@
   <div
     ref="paneWrapperRef"
     class="turtle-panes__pane"
-    :class="{ 'is-resizing': isInteractingWithASplitter }"
-    :style="computedStyles"
+    :class="{
+      'is-resizing': isInteractingWithASplitter,
+    }"
   >
-    <div class="turtle-panes__pane-content" ref="paneContentRef">
+    <div
+      class="turtle-panes__pane-content"
+      :class="{ 'has-hidden-overflow': context.containerWidth !== 0 }"
+      :style="computedStyles"
+      ref="paneContentRef"
+    >
       <slot></slot>
     </div>
     <Splitter :paneId="id" />
@@ -61,24 +67,53 @@ onMounted(async () => {
 
 const computedStyles = computed(() => {
   if (!id.value) return {};
+  const stylesAreReady = context.containerWidth !== 0;
+
+  if (!stylesAreReady) return {};
   const pane = context.panes[id.value];
   return {
     width: `${pane?.width}px`,
   };
 });
 
-watchEffect(() => {
-  if (!isInteractingWithPreviousSplitter.value || !id.value) return;
-  const [scrollWidth, clientWidth] = [
-    paneContentRef.value?.scrollWidth || 0,
-    paneContentRef.value?.clientWidth || 0,
-  ];
-  const hasHorizontalOverflow = scrollWidth > clientWidth;
-  console.log(`pane-${id.value} hasOverflow:`, hasHorizontalOverflow);
-  context.updatePane(id.value, {
-    hasHorizontalOverflow,
-  });
-});
+false &&
+  watchEffect(
+    () => {
+      const pixelsTravelled = context.interactionState.pixelsTravelled;
+      if (
+        !isInteractingWithPreviousSplitter.value ||
+        !id.value ||
+        pixelsTravelled === 0
+      )
+        return;
+
+      const [scrollWidth, clientWidth] = [
+        paneContentRef.value?.scrollWidth || 0,
+        paneContentRef.value?.clientWidth || 0,
+      ];
+      const hasHorizontalOverflow = scrollWidth > clientWidth;
+
+      if (hasHorizontalOverflow) {
+        endInteraction();
+        const differenceWithLastValidWidth =
+          context.panes[id.value].width - clientWidth;
+        console.log({
+          clientWidth,
+          scrollWidth,
+          alreadyPresentWidth: context.panes[id.value].width,
+          differenceWithLastValidWidth,
+        });
+        if (differenceWithLastValidWidth < 0) return;
+        context.updatePaneWidth(
+          id.value - 1,
+          differenceWithLastValidWidth * -1,
+        );
+      }
+    },
+    {
+      flush: "pre",
+    },
+  );
 </script>
 <style lang="scss">
 .turtle-panes {
@@ -87,6 +122,12 @@ watchEffect(() => {
     justify-content: space-between;
     &.is-resizing {
       pointer-events: none;
+    }
+  }
+  &__pane-content {
+    &.has-hidden-overflow {
+      overflow: hidden;
+      overflow-x: scroll;
     }
   }
 }

@@ -26,6 +26,7 @@ onMounted(() => {
   &__wrapper {
     display: flex;
     flex: 1;
+    overflow: hidden;
   }
 }
 </style>

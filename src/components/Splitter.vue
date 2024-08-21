@@ -27,22 +27,19 @@ const isInteractingWithAnotherSplitter = computed(
 const initialClientX: Ref<number | null> = ref(null);
 
 const handleMouseMove = (e: MouseEvent) => {
-  console.log("handleMouseMove:", e);
   const mouseMovementInPx: number =
     e.clientX - (initialClientX.value as number);
   context.updatePaneWidth(props.paneId as number, mouseMovementInPx);
-  console.log({ [`pane-${props.paneId}_mouseMovement`]: mouseMovementInPx });
+  context.setPixellsTravelledInPx(mouseMovementInPx);
   initialClientX.value = e.clientX;
 };
 
 const handleMouseUp = () => {
-  console.log("mouseUp happened");
   context.setActivePane(null);
 };
 
 const handleMouseDown = (e: MouseEvent) => {
   if (isInteractingWithAnotherSplitter.value) return;
-  console.log("handleMouseDown:", e);
   context.setActivePane(props.paneId);
   initialClientX.value = e.clientX;
 
