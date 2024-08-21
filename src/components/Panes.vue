@@ -5,24 +5,7 @@
 </template>
 <script setup lang="ts">
 import { ref, provide, onMounted, watchEffect } from "vue";
-import { Pane, Pane as PaneType } from "../types";
-
-interface ContextType {
-  panes: {
-    [id: number]: PaneType;
-  };
-  containerWidth: number;
-  interactionState: {
-    activePaneId: number | null;
-  };
-  setPanes: (newPanes: PaneType[]) => void;
-  addPane: (pane: PaneType) => Promise<number>;
-  updatePane: (paneId: PaneType["id"], newProps: Partial<PaneType>) => void;
-  removePane: (paneId: PaneType["id"]) => void;
-  setActivePane: (paneId: PaneType["id"]) => void;
-  updatePaneWidth: (paneId: PaneType["id"], widthDifference: number) => void;
-  setContainerWidth: (width: number) => void;
-}
+import { ContextType } from "../types";
 
 const context: ContextType = {
   panes: {},

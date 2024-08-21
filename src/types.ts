@@ -2,10 +2,11 @@ import Pane from "./components/Pane.vue";
 
 export type Pane = {
   width: number;
-  minWidth: number;
-  maxWidth: number;
-  isVisible: boolean;
-  id: number;
+  minWidth?: number;
+  maxWidth?: number;
+  isVisible?: boolean;
+  id?: number;
+  hasHorizontalOverflow?: boolean;
 };
 
 export interface PaneStoreState {
@@ -18,3 +19,20 @@ export interface PaneStoreActions {
 }
 
 export interface PaneStore extends PaneStoreState, PaneStoreActions {}
+
+export interface ContextType {
+  panes: {
+    [id: number]: Pane;
+  };
+  containerWidth: number;
+  interactionState: {
+    activePaneId: number | null;
+  };
+  setPanes: (newPanes: Pane[]) => void;
+  addPane: (pane: Pane) => Promise<number>;
+  updatePane: (paneId: Pane["id"], newProps: Partial<Pane>) => void;
+  removePane: (paneId: Pane["id"]) => void;
+  setActivePane: (paneId: Pane["id"]) => void;
+  updatePaneWidth: (paneId: Pane["id"], widthDifference: number) => void;
+  setContainerWidth: (width: number) => void;
+}
