@@ -6,6 +6,7 @@ export type Pane = {
   maxWidth?: number;
   isVisible?: boolean;
   id?: number;
+  lastWidthWithoutOverflow?: number;
   hasHorizontalOverflow?: boolean;
 };
 
@@ -26,13 +27,15 @@ export interface ContextType {
   };
   containerWidth: number;
   interactionState: {
-    activePaneId: number | null;
+    activePaneId?: number | null;
+    pixelsTravelled?: number;
   };
   setPanes: (newPanes: Pane[]) => void;
   addPane: (pane: Pane) => Promise<number>;
   updatePane: (paneId: Pane["id"], newProps: Partial<Pane>) => void;
   removePane: (paneId: Pane["id"]) => void;
   setActivePane: (paneId: Pane["id"]) => void;
+  setPixellsTravelledInPx: (pixelsTravelled: number) => void;
   updatePaneWidth: (paneId: Pane["id"], widthDifference: number) => void;
   setContainerWidth: (width: number) => void;
 }

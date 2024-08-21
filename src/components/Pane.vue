@@ -16,6 +16,7 @@ import { inject, onMounted, ref, computed, watchEffect } from "vue";
 import { Pane, ContextType } from "../types";
 import type { Ref } from "vue";
 import Splitter from "./Splitter.vue";
+import { endInteraction } from "./helpers";
 
 const contextRef: Ref<ContextType> | undefined = inject("context");
 if (!contextRef) {

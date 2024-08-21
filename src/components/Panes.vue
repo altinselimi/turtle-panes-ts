@@ -5,64 +5,7 @@
 </template>
 <script setup lang="ts">
 import { ref, provide, onMounted, watchEffect } from "vue";
-import { ContextType } from "../types";
-
-const context: ContextType = {
-  panes: {},
-  containerWidth: 0,
-  interactionState: {
-    activePaneId: null,
-  },
-  setPanes: function (newPanes) {
-    this.panes = newPanes;
-  },
-  addPane: function (pane) {
-    const context = this;
-    return new Promise((resolve) => {
-      const id: number = pane?.id || Object.keys(context.panes).length + 1;
-      context.panes[id] = { ...pane, id };
-      console.log(context.panes);
-      resolve(id);
-    });
-  },
-  updatePane: function (paneId, newProps) {
-    if (!this) return;
-    const context: { [key: string]: any } = this || {};
-    context.panes[paneId] = { ...context.panes[paneId], ...newProps };
-  },
-  removePane: function (paneId) {
-    const context: { [key: string]: any } = this || {};
-    context.panes = context.panes.filter(
-      (pane: PaneType) => pane.id !== paneId,
-    );
-  },
-  setActivePane: function (paneId) {
-    this.interactionState.activePaneId = paneId;
-  },
-  updatePaneWidth: function (paneId, widthDifference) {
-    const [targetPane, nextPane] = [this.panes[paneId], this.panes[paneId + 1]];
-    const [targetPaneNewWidth, nextPaneNewWidth] = [
-      targetPane.width + widthDifference,
-      nextPane.width - widthDifference,
-    ];
-    const [nextPaneMinWidth, targetPaneMaxWidth] = [
-      nextPane.minWidth || 0,
-      targetPane.maxWidth || this.containerWidth,
-    ];
-    if (
-      targetPaneNewWidth > targetPaneMaxWidth ||
-      nextPaneNewWidth < nextPaneMinWidth
-    )
-      return;
-    targetPane.width = targetPaneNewWidth;
-    nextPane.width = nextPaneNewWidth;
-  },
-  setContainerWidth: function (width) {
-    this.containerWidth = width;
-  },
-};
-
-const contextRef = ref(context);
+import { contextRef } from "./context";
 
 provide("context", contextRef);
 
