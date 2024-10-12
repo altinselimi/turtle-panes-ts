@@ -5,6 +5,7 @@ export type Pane = {
   minWidth?: number;
   maxWidth?: number;
   isVisible?: boolean;
+  isHiddenAfterMinWidthExceeded?: boolean;
   id?: number;
   lastWidthWithoutOverflow?: number;
   hasHorizontalOverflow?: boolean;

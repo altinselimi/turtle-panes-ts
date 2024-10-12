@@ -30,6 +30,7 @@ const paneContentRef: Ref<HTMLElement | null> = ref(null);
 const isInteractingWithASplitter = computed(
   () => context.interactionState.activePaneId != null,
 );
+
 const isInteractingWithPreviousSplitter = computed(
   () =>
     isInteractingWithASplitter.value &&
@@ -41,6 +42,7 @@ const props = defineProps<{
   minWidth?: Pane["minWidth"];
   initialWidth?: number;
   maxWidth?: Pane["maxWidth"];
+  isHiddenAfterMinWidthExceeded?: Pane["isHiddenAfterMinWidthExceeded"];
   isVisible?: Pane["isVisible"];
 }>();
 
@@ -54,7 +56,8 @@ onMounted(async () => {
     width: clientRect?.width,
     minWidth: props?.minWidth,
     maxWidth: props?.maxWidth,
-    isVisible: props?.isVisible,
+    isVisible: props?.isVisible || true,
+    isHiddenAfterMinWidthExceeded: props?.isHiddenAfterMinWidthExceeded || true,
     id: id.value || undefined,
   });
 });
@@ -62,8 +65,12 @@ onMounted(async () => {
 const computedStyles = computed(() => {
   if (!id.value) return {};
   const pane = context.panes[id.value];
+  console.log({
+    pane,
+  });
   return {
     width: `${pane?.width}px`,
+    visibility: pane?.isVisible ? "visible" : "hidden",
   };
 });
 
@@ -74,11 +81,22 @@ watchEffect(() => {
     paneContentRef.value?.clientWidth || 0,
   ];
   const hasHorizontalOverflow = scrollWidth > clientWidth;
-  console.log(`pane-${id.value} hasOverflow:`, hasHorizontalOverflow);
   context.updatePane(id.value, {
     hasHorizontalOverflow,
   });
 });
+
+if (props.isHiddenAfterMinWidthExceeded) {
+  watchEffect(() => {
+    if (!id.value) return;
+    const pane = context.panes[id.value];
+    if (pane.width <= pane.minWidth) {
+      context.updatePane(id.value, {
+        isVisible: false,
+      });
+    }
+  });
+}
 </script>
 <style lang="scss">
 .turtle-panes {

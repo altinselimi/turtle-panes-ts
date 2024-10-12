@@ -17,7 +17,6 @@ export const context: ContextType = {
     return new Promise((resolve) => {
       const id: number = pane?.id || Object.keys(context.panes).length + 1;
       context.panes[id] = { ...pane, id };
-      console.log(context.panes);
       resolve(id);
     });
   },
