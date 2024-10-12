@@ -42,15 +42,22 @@ export const context: ContextType = {
       targetPane.width + widthDifference,
       nextPane.width - widthDifference,
     ];
-    const [nextPaneMinWidth, targetPaneMaxWidth] = [
-      nextPane.minWidth || 0,
-      targetPane.maxWidth || this.containerWidth,
+    const [isTargetPaneMinWidth, isNextPaneMinWidth] = [
+      targetPaneNewWidth < targetPane.minWidth!,
+      nextPaneNewWidth < nextPane.minWidth!,
+    ];
+    const [isTargetPaneMaxWidth, isNextPaneMaxWidth] = [
+      targetPaneNewWidth > targetPane.maxWidth!,
+      nextPaneNewWidth > nextPane.maxWidth!,
     ];
     if (
-      targetPaneNewWidth > targetPaneMaxWidth ||
-      nextPaneNewWidth < nextPaneMinWidth
-    )
-      return;
+      isTargetPaneMinWidth ||
+      isNextPaneMinWidth ||
+      isTargetPaneMaxWidth ||
+      isNextPaneMaxWidth
+    ) {
+      throw new Error("Available width exceeded");
+    }
     targetPane.width = targetPaneNewWidth;
     nextPane.width = nextPaneNewWidth;
   },

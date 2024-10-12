@@ -12,7 +12,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import { inject, onMounted, ref, computed, watchEffect } from "vue";
+import {
+  inject,
+  onMounted,
+  ref,
+  computed,
+  watchEffect,
+  withDefaults,
+} from "vue";
 import { Pane, ContextType } from "../types";
 import type { Ref } from "vue";
 import Splitter from "./Splitter.vue";
@@ -38,13 +45,22 @@ const isInteractingWithPreviousSplitter = computed(
     context.interactionState.activePaneId === id.value - 1,
 );
 
-const props = defineProps<{
-  minWidth?: Pane["minWidth"];
-  initialWidth?: number;
-  maxWidth?: Pane["maxWidth"];
-  isHiddenAfterMinWidthExceeded?: Pane["isHiddenAfterMinWidthExceeded"];
-  isVisible?: Pane["isVisible"];
-}>();
+const props = withDefaults(
+  defineProps<{
+    minWidth?: Pane["minWidth"];
+    initialWidth?: number;
+    maxWidth?: Pane["maxWidth"];
+    isHiddenAfterMinWidthExceeded?: Pane["isHiddenAfterMinWidthExceeded"];
+    isVisible?: Pane["isVisible"];
+  }>(),
+  {
+    minWidth: 100,
+    initialWidth: undefined,
+    maxWidth: undefined,
+    isHiddenAfterMinWidthExceeded: true,
+    isVisible: true,
+  },
+);
 
 onMounted(async () => {
   const clientRect = paneWrapperRef?.value

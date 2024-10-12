@@ -29,9 +29,13 @@ const initialClientX: Ref<number | null> = ref(null);
 const handleMouseMove = (e: MouseEvent) => {
   const mouseMovementInPx: number =
     e.clientX - (initialClientX.value as number);
-  context.updatePaneWidth(props.paneId as number, mouseMovementInPx);
-  console.log({ [`pane-${props.paneId}_mouseMovement`]: mouseMovementInPx });
-  initialClientX.value = e.clientX;
+  try {
+    context.updatePaneWidth(props.paneId as number, mouseMovementInPx);
+    initialClientX.value = e.clientX;
+  } catch (e) {
+    console.error(e);
+    handleMouseUp();
+  }
 };
 
 const handleMouseUp = () => {
