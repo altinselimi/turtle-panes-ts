@@ -33,11 +33,14 @@ export const context: ContextType = {
     this.interactionState.activePaneId = paneId;
   },
   setPixellsTravelledInPx: function (pixels) {
-    this.interactionState.pixelsTravelled = pixels;
+    this.interactionState.pixelsTravelled += pixels;
   },
-  updatePaneWidth: function (paneId, widthDifference) {
-    if (!paneId) return;
+  updatePaneWidth: function (paneId, newWidth) {
+    if (!paneId) {
+      throw new Error("No pane id");
+    }
     const [targetPane, nextPane] = [this.panes[paneId], this.panes[paneId + 1]];
+    const widthDifference = newWidth - targetPane.width;
     const [targetPaneNewWidth, nextPaneNewWidth] = [
       targetPane.width + widthDifference,
       nextPane.width - widthDifference,
@@ -58,11 +61,16 @@ export const context: ContextType = {
     ) {
       throw new Error("Available width exceeded");
     }
+
     targetPane.width = targetPaneNewWidth;
     nextPane.width = nextPaneNewWidth;
   },
   setContainerWidth: function (width) {
     this.containerWidth = width;
+  },
+  resetInteractionState: function () {
+    this.interactionState.activePaneId = null;
+    this.interactionState.pixelsTravelled = 0;
   },
 };
 

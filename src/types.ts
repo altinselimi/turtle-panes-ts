@@ -6,9 +6,9 @@ export type Pane = {
   maxWidth?: number;
   isVisible?: boolean;
   isHiddenAfterMinWidthExceeded?: boolean;
-  id?: number;
-  lastWidthWithoutOverflow?: number;
-  hasHorizontalOverflow?: boolean;
+  id?: number | null;
+  widthOfContent?: number;
+  widthProvidedByPane?: number;
 };
 
 export interface PaneStoreState {
@@ -29,7 +29,7 @@ export interface ContextType {
   containerWidth: number;
   interactionState: {
     activePaneId?: number | null;
-    pixelsTravelled?: number;
+    pixelsTravelled: number;
   };
   setPanes: (newPanes: Pane[]) => void;
   addPane: (pane: Pane) => Promise<number>;
@@ -37,6 +37,7 @@ export interface ContextType {
   removePane: (paneId: Pane["id"]) => void;
   setActivePane: (paneId: Pane["id"]) => void;
   setPixellsTravelledInPx: (pixelsTravelled: number) => void;
-  updatePaneWidth: (paneId: Pane["id"], widthDifference: number) => void;
+  updatePaneWidth: (paneId: Pane["id"], newWidth: number) => void;
   setContainerWidth: (width: number) => void;
+  resetInteractionState: () => void;
 }

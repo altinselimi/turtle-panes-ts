@@ -18,38 +18,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import {
-  inject,
-  onMounted,
-  ref,
-  computed,
-  watchEffect,
-  withDefaults,
-} from "vue";
+import { inject, onMounted, ref, computed, watch, withDefaults } from "vue";
 import { Pane, ContextType } from "../types";
+import type { CSSProperties } from "vue";
+
 import type { Ref } from "vue";
 import Splitter from "./Splitter.vue";
-import { endInteraction } from "./helpers";
-
-const contextRef: Ref<ContextType> | undefined = inject("context");
-if (!contextRef) {
-  throw new Error("Pane is not wrapped in Panes component");
-}
-
-const context = contextRef.value;
-const id: Ref<number | null> = ref(null);
-const paneWrapperRef = ref(null);
-const paneContentRef: Ref<HTMLElement | null> = ref(null);
-const isInteractingWithASplitter = computed(
-  () => context.interactionState.activePaneId != null,
-);
-
-const isInteractingWithPreviousSplitter = computed(
-  () =>
-    isInteractingWithASplitter.value &&
-    id.value &&
-    context.interactionState.activePaneId === id.value - 1,
-);
 
 const props = withDefaults(
   defineProps<{
@@ -68,6 +42,29 @@ const props = withDefaults(
   },
 );
 
+const contextRef: Ref<ContextType> | undefined = inject("context");
+if (!contextRef) {
+  throw new Error("Pane is not wrapped in Panes component");
+}
+
+const context = contextRef.value;
+const id: Ref<number | null> = ref(null);
+const paneWrapperRef = ref(null);
+const paneContentRef: Ref<HTMLElement | null> = ref(null);
+const isInteractingWithASplitter = computed(
+  () => context.interactionState.activePaneId != null,
+);
+const isDependentOnCurrentActiveSplitter = computed(
+  () =>
+    id.value &&
+    [id.value, id.value - 1].includes(
+      context.interactionState.activePaneId || -1,
+    ),
+);
+const splitterTravelledPx = computed(
+  () => context.interactionState.pixelsTravelled,
+);
+
 onMounted(async () => {
   const clientRect = paneWrapperRef?.value
     ? (paneWrapperRef?.value as HTMLElement)?.getBoundingClientRect()
@@ -84,44 +81,54 @@ onMounted(async () => {
   });
 });
 
-const computedStyles = computed(() => {
+const computedStyles = computed<CSSProperties>(() => {
   if (!id.value) return {};
   const stylesAreReady = context.containerWidth !== 0;
 
   if (!stylesAreReady) return {};
   const pane = context.panes[id.value];
-  console.log({
-    pane,
-  });
   return {
     width: `${pane?.width}px`,
     visibility: pane?.isVisible ? "visible" : "hidden",
   };
 });
 
-watchEffect(() => {
-  if (!isInteractingWithPreviousSplitter.value || !id.value) return;
-  const [scrollWidth, clientWidth] = [
-    paneContentRef.value?.scrollWidth || 0,
-    paneContentRef.value?.clientWidth || 0,
-  ];
-  const hasHorizontalOverflow = scrollWidth > clientWidth;
-  context.updatePane(id.value, {
-    hasHorizontalOverflow,
-  });
-});
-
-if (props.isHiddenAfterMinWidthExceeded) {
-  watchEffect(() => {
-    if (!id.value) return;
-    const pane = context.panes[id.value];
-    if (pane.width <= pane.minWidth) {
-      context.updatePane(id.value, {
-        isVisible: false,
-      });
+watch(
+  [id, isDependentOnCurrentActiveSplitter, splitterTravelledPx],
+  ([
+    idValue,
+    isDependentOnCurrentActiveSplitterValue,
+    splitterTravelledPxValue,
+  ]) => {
+    if (!idValue || !isDependentOnCurrentActiveSplitterValue) return;
+    const [widthOfContent, widthProvidedByPane] = [
+      paneContentRef.value?.scrollWidth || 0,
+      paneContentRef.value?.clientWidth || 0,
+    ];
+    context.updatePane(idValue, {
+      widthProvidedByPane: widthProvidedByPane,
+      widthOfContent: widthOfContent,
+    });
+    const isOverflowing = widthOfContent > widthProvidedByPane;
+    if (isOverflowing) {
+      const activePaneId: number = context.interactionState
+        .activePaneId as number;
+      const isCurrentPaneActive = activePaneId === idValue;
+      if (isCurrentPaneActive) {
+        const newWidth = widthOfContent;
+        context.updatePaneWidth(idValue, newWidth);
+      } else {
+        const activePaneWidth = context.panes[activePaneId].width;
+        const overflownPaneNeededPixels =
+          widthOfContent - context.panes[idValue].width;
+        const newWidth = activePaneWidth - overflownPaneNeededPixels;
+        context.updatePaneWidth(activePaneId, newWidth);
+      }
+      // updatePaneWidth
+      context.resetInteractionState();
     }
-  });
-}
+  },
+);
 </script>
 <style lang="scss">
 .turtle-panes {

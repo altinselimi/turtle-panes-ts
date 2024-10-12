@@ -10,12 +10,18 @@
 import { ref, inject, computed } from "vue";
 import { attachPaneSplitterInteractionListeners } from "./helpers";
 import type { Ref } from "vue";
+import { ContextType } from "../types";
 
 const props = defineProps<{
   paneId?: number | null;
+  clientWidth?: number;
+  scrollWidth?: number;
 }>();
 
-const contextRef: any = inject("context");
+const contextRef: Ref<ContextType> | undefined = inject("context");
+if (!contextRef) {
+  throw new Error("Pane is not wrapped in Panes component");
+}
 const context = contextRef.value;
 const isInteractingWithSplitter = computed(
   () => context.interactionState.activePaneId === props.paneId,
@@ -27,10 +33,13 @@ const isInteractingWithAnotherSplitter = computed(
 const initialClientX: Ref<number | null> = ref(null);
 
 const handleMouseMove = (e: MouseEvent) => {
+  if (!isInteractingWithSplitter.value) return;
   const mouseMovementInPx: number =
     e.clientX - (initialClientX.value as number);
   try {
-    context.updatePaneWidth(props.paneId as number, mouseMovementInPx);
+    const newWidth =
+      context.panes[props.paneId as number].width + mouseMovementInPx;
+    context.updatePaneWidth(props.paneId as number, newWidth);
     context.setPixellsTravelledInPx(mouseMovementInPx);
     initialClientX.value = e.clientX;
   } catch (e) {
@@ -40,7 +49,7 @@ const handleMouseMove = (e: MouseEvent) => {
 };
 
 const handleMouseUp = () => {
-  context.setActivePane(null);
+  context.resetInteractionState();
 };
 
 const handleMouseDown = (e: MouseEvent) => {
