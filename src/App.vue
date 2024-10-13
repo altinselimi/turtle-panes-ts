@@ -12,25 +12,12 @@
     </div>
   </div>
   <div class="demo-showcase__wrapper">
-    <TurtlePanes>
-      <TurtlePane>
-        <FirstPaneContent />
-      </TurtlePane>
-      <TurtlePane>
-        <SecondPaneContent />
-      </TurtlePane>
-      <TurtlePane>
-        <ThirdPaneContent />
-      </TurtlePane>
-    </TurtlePanes>
+    <TurtlePanesDemo />
   </div>
 </template>
 
 <script setup>
-import { TurtlePanes, TurtlePane } from "./components/";
-import FirstPaneContent from "./content/FirstPaneContent.vue";
-import SecondPaneContent from "./content/SecondPaneContent.vue";
-import ThirdPaneContent from "./content/ThirdPaneContent.vue";
+import TurtlePanesDemo from "./TurtlePanesDemo.vue";
 </script>
 
 <style lang="scss">

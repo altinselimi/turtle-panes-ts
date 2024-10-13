@@ -2,6 +2,7 @@
   <div class="turtle-panes__splitter-wrapper">
     <div
       class="turtle-panes__splitter-target"
+      :data-testid="`splitter-${props.paneId}`"
       @mousedown="handleMouseDown"
     ></div>
   </div>
